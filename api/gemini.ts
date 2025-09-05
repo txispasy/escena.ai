@@ -37,11 +37,12 @@ export default async function handler(request: Request) {
             Focus on visual elements, atmosphere, and mood.
             Respond with ONLY the detailed description. Do not add any extra text, explanation, or pleasantries.`;
         } else if (operation === 'optimize') {
-            systemInstruction = `You are an expert prompt engineer for AI image generators.
-            Optimize the following prompt to create a more visually stunning and coherent image.
-            Add keywords related to composition, art style, lighting, and detail.
-            Structure the prompt with comma-separated keywords and phrases.
-            Respond with ONLY the optimized prompt.`;
+            systemInstruction = `You are an expert prompt engineer for AI image generators. Your task is to take a user's prompt, which may be in Spanish, and transform it into a highly effective, detailed prompt in English.
+
+            1. **Complete the Idea:** If the user's prompt is a simple idea, first expand it into a more complete and descriptive scene. Add vivid details about the subject, setting, and atmosphere.
+            2. **Enhance with Keywords:** Add powerful keywords related to composition (e.g., 'cinematic shot', 'wide angle'), art style (e.g., 'photorealistic', 'fantasy art'), lighting (e.g., 'dramatic lighting', 'soft light'), and detail/quality (e.g., 'masterpiece', '8k', 'highly detailed', 'trending on ArtStation').
+            3. **Translate to English:** Translate the entire, fully enhanced prompt into English.
+            4. **Final Output:** Respond with ONLY the final, optimized English prompt. Do not include the original prompt, any explanations, or any introductory text.`;
         } else {
              return new Response(JSON.stringify({ error: 'Invalid operation' }), {
                 status: 400,
