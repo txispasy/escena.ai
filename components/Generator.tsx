@@ -65,13 +65,6 @@ const Generator = () => {
 
     try {
         let finalPrompt = basePrompt;
-
-        if (genMode === 'Calidad') {
-            finalPrompt += ', masterpiece, best quality, highly detailed';
-        }
-        if (mode === 'Pro' && negativePrompt) {
-            finalPrompt += ` --neg ${negativePrompt}`;
-        }
         
         const generationPromises = Array.from({ length: variants }).map((_, i) => {
           const [width, height] = aspectRatio === 'Horizontal' ? [768, 512] : [512, 768];
@@ -141,7 +134,7 @@ const Generator = () => {
     } finally {
         setIsLoading(false);
     }
-  }, [isLoading, mode, negativePrompt, style, aspectRatio, genMode, variants, setHistory]);
+  }, [isLoading, style, aspectRatio, variants, setHistory]);
 
 
   const startGenerationProcess = useCallback(() => {
@@ -154,15 +147,24 @@ const Generator = () => {
         return;
     }
 
-    const optimized = optimizePrompt(originalBasePrompt, style);
+    // Client-side prompt enhancement
+    let enhancedPrompt = optimizePrompt(originalBasePrompt, style);
+    if (genMode === 'Calidad') {
+        enhancedPrompt += ', masterpiece, best quality, highly detailed';
+    }
+    if (mode === 'Pro' && negativePrompt) {
+        // Perchance doesn't have a standard negative prompt API via URL, 
+        // but some models might interpret it. We keep it for potential compatibility.
+        // It's better to guide the AI with positive phrasing in the main prompt.
+    }
 
     setOptimizationModal({
         isOpen: true,
         original: originalBasePrompt,
-        optimized: optimized,
+        optimized: enhancedPrompt,
     });
 
-  }, [isLoading, mode, scenes, style]);
+  }, [isLoading, mode, scenes, style, genMode, negativePrompt]);
 
 
   const addToGallery = (image: GeneratedImage) => {
@@ -175,6 +177,7 @@ const Generator = () => {
   };
   
   const totalPromptLength = scenes.reduce((acc, s) => acc + s.length, 0);
+  const activeColorClass = mode === 'Simple' ? 'bg-brand-pink' : 'bg-brand-purple';
 
   return (
     <div className="space-y-8">
@@ -193,13 +196,14 @@ const Generator = () => {
           <div>
             <label htmlFor="simple-prompt" className="block text-sm font-medium text-gray-300 mb-2">
               Describe lo que quieres crear (o una idea simple)
+              <span className="text-gray-400 text-xs ml-2"> (mejor en Inglés)</span>
             </label>
             <div className="relative">
               <textarea
                 id="simple-prompt"
                 rows={4}
                 className="w-full bg-brand-light-gray rounded-md p-3 pr-4 focus:ring-2 focus:ring-brand-pink focus:outline-none transition"
-                placeholder="e.g., Un robot encuentra una flor en una ciudad post-apocalíptica"
+                placeholder="e.g., A robot finds a flower in a post-apocalyptic city"
                 value={scenes[0]}
                 onChange={(e) => handleSceneChange(0, e.target.value)}
                 maxLength={4000}
@@ -211,13 +215,14 @@ const Generator = () => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Describe tus escenas (hasta {MAX_SCENES})
+              <span className="text-gray-400 text-xs ml-2"> (mejor en Inglés)</span>
             </label>
             {scenes.map((scene, index) => (
               <div key={index} className="mb-3">
                 <textarea
                   rows={2}
-                  className="w-full bg-brand-light-gray rounded-md p-3 focus:ring-2 focus:ring-brand-pink focus:outline-none transition"
-                  placeholder={`Escena ${index + 1}: ej., Un robot encuentra una flor`}
+                  className="w-full bg-brand-light-gray rounded-md p-3 focus:ring-2 focus:ring-brand-purple focus:outline-none transition"
+                  placeholder={`Escena ${index + 1}: ej., A robot finds a flower`}
                   value={scene}
                   onChange={(e) => handleSceneChange(index, e.target.value)}
                   maxLength={4000 / scenes.length}
@@ -242,7 +247,7 @@ const Generator = () => {
                     id="negative-prompt"
                     rows={2}
                     className="w-full bg-brand-light-gray rounded-md p-3 focus:ring-2 focus:ring-brand-purple focus:outline-none transition"
-                    placeholder="ej., mala anatomía, deformado, texto, marcas de agua"
+                    placeholder="ej., bad anatomy, deformed, text, watermark"
                     value={negativePrompt}
                     onChange={(e) => handleNegativePromptChange(e.target.value)}
                     maxLength={1000}
@@ -283,7 +288,7 @@ const Generator = () => {
                 key={ar} 
                 onClick={() => setAspectRatio(ar)}
                 className={`w-1/2 py-2 text-sm rounded transition-colors ${
-                  aspectRatio === ar ? 'bg-brand-pink text-white' : 'hover:bg-brand-gray'
+                  aspectRatio === ar ? `${activeColorClass} text-white` : 'hover:bg-brand-gray'
                 }`}
               >
                 {ar}
@@ -299,7 +304,7 @@ const Generator = () => {
                 key={gm} 
                 onClick={() => setGenMode(gm)}
                 className={`w-1/2 py-2 text-sm rounded transition-colors ${
-                  genMode === gm ? 'bg-brand-pink text-white' : 'hover:bg-brand-gray'
+                  genMode === gm ? `${activeColorClass} text-white` : 'hover:bg-brand-gray'
                 }`}
               >
                 {gm}
@@ -332,7 +337,7 @@ const Generator = () => {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         ) : (
-          `Generar ${variants * scenes.filter(s => s.trim()).length} Imágenes`
+          `Generar ${variants * (scenes.filter(s => s.trim()).length || (mode === 'Simple' && scenes[0] ? 1 : 0) ) } Imágenes`
         )}
       </button>
       
@@ -362,7 +367,7 @@ const Generator = () => {
           <div className="bg-brand-gray w-full max-w-2xl rounded-lg shadow-xl flex flex-col">
             <div className="p-4 border-b border-brand-light-gray">
               <h2 className="text-xl font-bold">Optimización de Prompt</h2>
-              <p className="text-sm text-gray-400">La IA ha mejorado tu prompt para obtener mejores resultados. ¿Cuál quieres usar?</p>
+              <p className="text-sm text-gray-400">Hemos mejorado tu prompt para obtener mejores resultados. ¿Cuál quieres usar?</p>
             </div>
             <div className="p-6 space-y-4 md:space-y-0 md:flex md:gap-4 flex-grow">
                 <div className="md:w-1/2">

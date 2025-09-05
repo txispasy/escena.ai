@@ -15,7 +15,9 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabChange }) => {
           onClick={() => onTabChange(tab)}
           className={`w-1/2 py-2.5 text-sm font-semibold rounded-md transition-all duration-300 ${
             activeTab === tab 
-              ? `bg-gradient-to-r from-pink-500 to-red-500 shadow-lg text-white`
+              ? tab === 'Simple' 
+                ? 'bg-brand-pink text-white shadow-lg' 
+                : 'bg-brand-purple text-white shadow-lg'
               : 'bg-transparent text-gray-300 hover:bg-brand-light-gray'
           }`}
         >
