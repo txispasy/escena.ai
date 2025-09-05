@@ -48,11 +48,44 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, showActions = false, onAdd
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const text = `Mira esta imagen que generé con Escena.AI: ${image.prompt}`;
-    const encodedText = encodeURIComponent(text);
-    // Note: Sharing image URL directly might not work on all platforms
-    window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+    const fallbackShare = () => {
+        alert('Tu navegador no soporta compartir imágenes directamente. Se compartirá solo el texto.');
+        const encodedText = encodeURIComponent(text);
+        window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+    };
+
+    if (navigator.share) {
+        try {
+            // Convert data URL to blob to file
+            const response = await fetch(image.url);
+            const blob = await response.blob();
+            const extension = blob.type.split('/')[1] || 'png';
+            const filename = `${image.prompt.substring(0, 30).replace(/\s/g, '_')}.${extension}`;
+            const file = new File([blob], filename, { type: blob.type });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                 await navigator.share({
+                    files: [file],
+                    title: 'Imagen de Escena.AI',
+                    text: text,
+                });
+            } else {
+               throw new Error("File sharing not supported.");
+            }
+        } catch (error) {
+             // AbortError is expected if the user cancels the share dialog.
+            if (error instanceof DOMException && error.name === 'AbortError') {
+                console.log("Share action was cancelled by the user.");
+            } else {
+                console.error('Web Share API failed, falling back:', error);
+                fallbackShare();
+            }
+        }
+    } else {
+        fallbackShare();
+    }
   };
 
   return (
