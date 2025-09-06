@@ -1,16 +1,14 @@
 import React from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
-import type { GeneratedImage } from '../types';
+import type { GalleryImage } from '../types';
 import ImageCard from './ImageCard';
 
 const Gallery = () => {
-  const [allImages] = useLocalStorage<GeneratedImage[]>('imageData', []);
+  const [gallery] = useLocalStorage<GalleryImage[]>('imageGallery', []);
 
   const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
   const now = Date.now();
-
-  const publicImages = allImages.filter(image => image.isPublic);
-  const recentImages = publicImages.filter(image => (now - image.timestamp) < NINETY_DAYS_MS);
+  const recentImages = gallery.filter(image => (now - image.timestamp) < NINETY_DAYS_MS);
 
   return (
     <div>

@@ -7,19 +7,19 @@ interface HistoryProps {
 }
 
 const History: React.FC<HistoryProps> = ({ onClose }) => {
-  const [allImages, setAllImages] = useLocalStorage<GeneratedImage[]>('imageData', []);
+  const [history, setHistory] = useLocalStorage<GeneratedImage[]>('imageHistory', []);
   
   const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
   const now = Date.now();
-  const recentHistory = allImages.filter(image => (now - image.timestamp) < NINETY_DAYS_MS);
+  const recentHistory = history.filter(image => (now - image.timestamp) < NINETY_DAYS_MS);
 
   const deleteImage = (id: string) => {
-    setAllImages(currentImages => currentImages.filter(image => image.id !== id));
+    setHistory(currentHistory => currentHistory.filter(image => image.id !== id));
   };
 
   const clearHistory = () => {
     if (window.confirm("¿Estás seguro de que quieres borrar todo el historial? Esta acción no se puede deshacer.")) {
-        setAllImages([]);
+        setHistory([]);
     }
   }
 

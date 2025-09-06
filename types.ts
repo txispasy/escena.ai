@@ -1,14 +1,4 @@
-export type VisualStyle =
-  | 'Artistic'
-  | 'Realistic'
-  | 'Anime'
-  | 'Cartoon'
-  | 'Fantasy'
-  | 'Sci-Fi'
-  | 'Abstract'
-  | '3D Model'
-  | 'Pixel Art';
-
+export type VisualStyle = 'Pixar' | 'Realistic' | 'Fantasy' | 'Creepy' | 'Comic' | 'Anime' | '3D Disney' | 'Cinematic';
 export type AspectRatio = 'Horizontal' | 'Vertical';
 export type GenerationMode = 'Calidad' | 'Rápido';
 export type GeneratorMode = 'Simple' | 'Pro';
@@ -21,6 +11,8 @@ export interface GeneratedImage {
   style: VisualStyle;
   timestamp: number;
   aspectRatio: AspectRatio;
-  isPublic?: boolean;
-  votes?: number;
+}
+
+export interface GalleryImage extends GeneratedImage {
+  votes: number;
 }

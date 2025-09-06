@@ -1,15 +1,8 @@
 import type { VisualStyle, AspectRatio, GenerationMode } from './types';
 
 export const VISUAL_STYLES: VisualStyle[] = [
-  'Artistic',
-  'Realistic',
-  'Anime',
-  'Cartoon',
-  'Fantasy',
-  'Sci-Fi',
-  'Abstract',
-  '3D Model',
-  'Pixel Art',
+  'Pixar', 'Realistic', 'Fantasy', 'Creepy', 
+  'Comic', 'Anime', '3D Disney', 'Cinematic'
 ];
 
 export const ASPECT_RATIOS: AspectRatio[] = ['Horizontal', 'Vertical'];

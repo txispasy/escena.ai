@@ -5,15 +5,14 @@ import type { VisualStyle } from '../types';
 // to leverage the image generator's native style understanding more effectively.
 
 const styleTemplates: Record<VisualStyle, (prompt: string) => string> = {
-    'Artistic': (p) => `An artistic painting of "${p}", beautiful composition, dynamic lighting, intricate details, concept art, trending on artstation.`,
-    'Realistic': (p) => `A photorealistic ultra-detailed photograph of "${p}", 8k, sharp focus, professional color grading, shot on a DSLR camera with a 50mm lens.`,
-    'Anime': (p) => `A beautiful anime scene of "${p}", in the style of Studio Ghibli and Makoto Shinkai, vibrant colors, detailed background, cinematic lighting.`,
-    'Cartoon': (p) => `A playful cartoon illustration of "${p}", in the style of modern western animation, bold outlines, vibrant colors, expressive characters.`,
-    'Fantasy': (p) => `An epic fantasy book cover illustration of "${p}". Features majestic landscapes, mythical creatures, elaborate armor, and magical elements.`,
-    'Sci-Fi': (p) => `A futuristic sci-fi concept art of "${p}". Features advanced technology, sleek designs, neon lights, and a cyberpunk or space opera aesthetic.`,
-    'Abstract': (p) => `An abstract piece of art representing "${p}". Features geometric shapes, bold colors, non-representational forms, and a focus on texture and composition.`,
-    '3D Model': (p) => `A high-quality 3D model render of "${p}", created with Blender and rendered in Octane. Features realistic materials, detailed textures, and studio lighting.`,
-    'Pixel Art': (p) => `A detailed pixel art scene of "${p}", 16-bit, vibrant color palette, reminiscent of classic SNES games, trending on itch.io.`
+    'Pixar': (p) => `A 3D render of "${p}", in the iconic style of a Disney Pixar animation. Features vibrant colors, soft lighting, and detailed, expressive character design.`,
+    'Realistic': (p) => `An ultra-detailed, photorealistic 8k photograph of "${p}". Shot with a professional camera, featuring sharp focus, perfect composition, and cinematic lighting.`,
+    'Fantasy': (p) => `An epic fantasy digital painting of "${p}". In the style of fantasy art legends like Greg Rutkowski, dramatic lighting, highly detailed, trending on ArtStation.`,
+    'Creepy': (p) => `A creepy, unsettling, surreal horror style artwork depicting "${p}". Ominous, atmospheric lighting, dark themes, in the style of Zdzisław Beksiński.`,
+    'Comic': (p) => `A vibrant comic book panel illustrating "${p}", in the classic style of Marvel or DC Comics. Features bold lines, dynamic action, and graphic novel aesthetics.`,
+    'Anime': (p) => `A beautiful, high-quality anime artwork of "${p}", reminiscent of the style of Makoto Shinkai or Studio Ghibli. Features beautiful scenery and emotional lighting.`,
+    '3D Disney': (p) => `A charming 3D render of "${p}", in the modern Disney animation style. Features smooth textures, vibrant colors, and a heartwarming feel.`,
+    'Cinematic': (p) => `A cinematic film still of "${p}". Features dramatic, moody lighting, high contrast, film grain, and masterful composition. The scene feels like it was pulled from a blockbuster movie.`
 };
 
 /**
@@ -26,9 +25,8 @@ const styleTemplates: Record<VisualStyle, (prompt: string) => string> = {
 export const optimizePrompt = (prompt: string, style: VisualStyle): string => {
     if (!prompt.trim()) return '';
     
-    // Fallback for any style not in the template record
     const templateBuilder = styleTemplates[style] || ((p) => p);
     
-    // Build the prompt from the template
-    return templateBuilder(prompt.trim());
+    // Build the prompt from the template and add universal quality enhancers.
+    return `${templateBuilder(prompt.trim())}, masterpiece, best quality, ultra-detailed`;
 };

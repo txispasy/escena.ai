@@ -1,22 +1,20 @@
 import React from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
-import type { GeneratedImage } from '../types';
+import type { GalleryImage } from '../types';
 import ImageCard from './ImageCard';
 
 const Ranking = () => {
-  const [allImages, setAllImages] = useLocalStorage<GeneratedImage[]>('imageData', []);
+  const [gallery, setGallery] = useLocalStorage<GalleryImage[]>('imageGallery', []);
 
   const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
   const now = Date.now();
-  
-  const publicImages = allImages.filter(image => image.isPublic);
-  const recentImages = publicImages.filter(image => (now - image.timestamp) < NINETY_DAYS_MS);
+  const recentImages = gallery.filter(image => (now - image.timestamp) < NINETY_DAYS_MS);
 
-  const sortedImages = [...recentImages].sort((a, b) => (b.votes ?? 0) - (a.votes ?? 0));
+  const sortedImages = [...recentImages].sort((a, b) => b.votes - a.votes);
 
   const handleVote = (id: string, delta: number) => {
-    setAllImages(currentImages => 
-      currentImages.map(image => 
+    setGallery(currentGallery => 
+      currentGallery.map(image => 
         image.id === id ? { ...image, votes: (image.votes || 0) + delta } : image
       )
     );
@@ -41,7 +39,7 @@ const Ranking = () => {
               <div className="flex-shrink-0 w-full md:w-auto">
                 <ImageCard image={image} showActions={false} className="md:w-64"/>
               </div>
-              <div className="flex-grow text-center md:text-left min-w-0">
+              <div className="flex-grow text-center md:text-left">
                 <p className="text-gray-400 text-sm truncate" title={image.prompt}>
                   Prompt: {image.prompt}
                 </p>
